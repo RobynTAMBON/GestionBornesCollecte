@@ -1,0 +1,6 @@
+@GestionBornesCollecte.Api_HostAddress = http://localhost:5211
+
+GET {{GestionBornesCollecte.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
