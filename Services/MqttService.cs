@@ -21,6 +21,7 @@ namespace GestionBornesCollecte.Api.Services
 
             // Connexion au broker
             await _client.ConnectAsync(options);
+            Console.WriteLine("Connecté au broker MQTT.");
 
             // Abonnement au topic
             var topicFilter = new MqttTopicFilterBuilder()
@@ -28,6 +29,7 @@ namespace GestionBornesCollecte.Api.Services
                 .Build();
 
             await _client.SubscribeAsync(topicFilter);
+            Console.WriteLine("Abonné au topic 'temp/b213/tambon'.");
 
             // Réception des messages
             _client.ApplicationMessageReceivedAsync += e =>
