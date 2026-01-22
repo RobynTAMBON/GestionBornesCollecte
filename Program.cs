@@ -1,6 +1,16 @@
+using GestionBornesCollecte.Api.Data;
 using GestionBornesCollecte.Api.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Récupération de la chaîne de connexion
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Injection du DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+);
 
 // Add services to the container.
 
