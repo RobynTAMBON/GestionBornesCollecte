@@ -1,46 +1,51 @@
-﻿using MQTTnet;
+﻿using GestionBornesCollecte.Api.Dtos;
+using MQTTnet;
 using System.Text;
+using System.Text.Json;
 
 namespace GestionBornesCollecte.Api.Services
 {
     public class MqttService
     {
+        private readonly IServiceScopeFactory _scopeFactory;
         private IMqttClient _client;
+
+        // Injection de dépendance
+        public MqttService(IServiceScopeFactory scopeFactory)
+        {
+            _scopeFactory = scopeFactory;
+        }
 
         public async Task StartAsync()
         {
-            // Création du client MQTT (v5)
             var factory = new MqttClientFactory();
             _client = factory.CreateMqttClient();
 
-            // Configuration de la connexion
             var options = new MqttClientOptionsBuilder()
                 .WithTcpServer("localhost", 1883)
                 .WithClientId(Guid.NewGuid().ToString())
                 .Build();
 
-            // Connexion au broker
             await _client.ConnectAsync(options);
             Console.WriteLine("Connecté au broker MQTT.");
 
-            // Abonnement au topic
-            var topicFilter = new MqttTopicFilterBuilder()
-                .WithTopic("temp/b213/tambon")
-                .Build();
+            await _client.SubscribeAsync("temp/b213/tambon");
+            Console.WriteLine("Abonné au topic \"temp/b213/tambon\".");
 
-            await _client.SubscribeAsync(topicFilter);
-            Console.WriteLine("Abonné au topic 'temp/b213/tambon'.");
-
-            // Réception des messages
-            _client.ApplicationMessageReceivedAsync += e =>
+            // handler ASYNC
+            _client.ApplicationMessageReceivedAsync += async e =>
             {
-                var message = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
-                Console.WriteLine($"MQTT reçu : {message}");
-                return Task.CompletedTask;
-            };
+                var payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
+                Console.WriteLine($"MQTT reçu : {payload}");
 
+                var dto = JsonSerializer.Deserialize<MesureMqttDto>(payload);
+                if (dto == null) return;
+
+                using var scope = _scopeFactory.CreateScope();
+                var mesureService = scope.ServiceProvider.GetRequiredService<IMesureService>();
+
+                await mesureService.TraiterMesureAsync(dto);
+            };
         }
     }
-
-
 }

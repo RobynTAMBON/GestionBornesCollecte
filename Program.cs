@@ -18,6 +18,11 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IMesureService, MesureService>();
+
+builder.Services.AddSingleton<MqttService>();
+builder.Services.AddHostedService<MqttHostedService>();
+
 
 var app = builder.Build();
 
@@ -33,8 +38,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
-var mqttService = new MqttService();
-await mqttService.StartAsync();
 
 app.Run();
