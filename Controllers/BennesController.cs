@@ -1,6 +1,7 @@
 ﻿using GestionBornesCollecte.Api.Data;
 using GestionBornesCollecte.Api.Dtos;
 using GestionBornesCollecte.Api.Models;
+using GestionBornesCollecte.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GestionBornesCollecte.Api.Controllers
@@ -20,7 +21,7 @@ namespace GestionBornesCollecte.Api.Controllers
 
         // GET: api/Bennes
 
-        [HttpGet(Name = "GetBennes")]
+        [HttpGet("GetBennes")]
         public IActionResult GetAll()
         {
             var bennes = _context.Bennes.ToList();
@@ -53,6 +54,16 @@ namespace GestionBornesCollecte.Api.Controllers
                 new { id = benne.Id },
                 benne
             );
+        }
+
+
+        // GET: api/Bennes/overview
+
+        [HttpGet("overview")]
+        public async Task<IActionResult> GetOverview([FromServices] IBenneService benneService)
+        {
+            var overview = await benneService.GetOverviewAsync();
+            return Ok(overview);
         }
     }
 }
