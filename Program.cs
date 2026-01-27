@@ -19,6 +19,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IMesureService, MesureService>();
+builder.Services.AddScoped<IBenneService, BenneService>();
 
 builder.Services.AddSingleton<MqttService>();
 builder.Services.AddHostedService<MqttHostedService>();
