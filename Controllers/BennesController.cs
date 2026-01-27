@@ -3,6 +3,7 @@ using GestionBornesCollecte.Api.Dtos;
 using GestionBornesCollecte.Api.Models;
 using GestionBornesCollecte.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GestionBornesCollecte.Api.Controllers
 {
@@ -65,5 +66,41 @@ namespace GestionBornesCollecte.Api.Controllers
             var overview = await benneService.GetOverviewAsync();
             return Ok(overview);
         }
+
+
+        // GET: api/Bennes/{id}
+
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<BenneDetailDto>> GetById(int id)
+        {
+            var benne = await _context.Bennes
+                .Where(b => b.Id == id)
+                .Select(b => new BenneDetailDto
+                {
+                    Id = b.Id,
+                    Nom = b.Nom,
+                    Localisation = b.Localisation,
+                    CapaciteMax = b.CapaciteMax,
+                    DerniereMesure = b.Mesures
+                        .OrderByDescending(m => m.Timestamp)
+                        .Select(m => (DateTime?)m.Timestamp)
+                        .FirstOrDefault(),
+                    NiveauRemplissage = b.Mesures
+                        .OrderByDescending(m => m.Timestamp)
+                        .Select(m => (int?)m.NiveauRemplissage)
+                        .FirstOrDefault(),
+                    BatterieVolt = b.Mesures
+                        .OrderByDescending(m => m.Timestamp)
+                        .Select(m => (float?)m.BatterieVolt)
+                        .FirstOrDefault()
+                })
+                .FirstOrDefaultAsync();
+
+            if (benne == null)
+                return NotFound();
+
+            return Ok(benne);
+        }
+
     }
 }
