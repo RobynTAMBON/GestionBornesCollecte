@@ -51,7 +51,7 @@ namespace GestionBornesCollecte.Api.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(
-                nameof(GetAll),
+                nameof(GetById),
                 new { id = benne.Id },
                 benne
             );
@@ -102,5 +102,27 @@ namespace GestionBornesCollecte.Api.Controllers
             return Ok(benne);
         }
 
+
+        // PUT: api/Bennes/{id}
+
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Update(int id, [FromBody] UpdateBenneDto dto)
+        {
+            var benne = await _context.Bennes.FindAsync(id);
+            if (benne == null)
+                return NotFound();
+
+            if (dto.Nom != null)
+                benne.Nom = dto.Nom;
+
+            if (dto.Localisation != null)
+                benne.Localisation = dto.Localisation;
+
+            if (dto.CapaciteMax.HasValue)
+                benne.CapaciteMax = dto.CapaciteMax.Value;
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
     }
 }
