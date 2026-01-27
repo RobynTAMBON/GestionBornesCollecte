@@ -40,7 +40,7 @@ namespace GestionBornesCollecte.Api.Services
 
                 var dto = JsonSerializer.Deserialize<MesureMqttDto>(payload);
                 if (dto == null) return;
-
+                Console.WriteLine($"DTO reçu -> BenneId={dto.BenneId}, Niveau={dto.NiveauRemplissage}, Batterie={dto.BatterieVolt}");
                 using var scope = _scopeFactory.CreateScope();
                 var mesureService = scope.ServiceProvider.GetRequiredService<IMesureService>();
 
