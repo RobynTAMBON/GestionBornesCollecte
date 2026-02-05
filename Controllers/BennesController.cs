@@ -1,5 +1,6 @@
 ﻿using GestionBornesCollecte.Api.Data;
 using GestionBornesCollecte.Api.Dtos;
+using GestionBornesCollecte.Api.Dtos.Common;
 using GestionBornesCollecte.Api.Models;
 using GestionBornesCollecte.Api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -23,10 +24,102 @@ namespace GestionBornesCollecte.Api.Controllers
         // GET: api/Bennes
 
         [HttpGet("GetBennes")]
-        public IActionResult GetAll()
+        public async Task<ActionResult<IEnumerable<BenneDto>>> GetAll()
         {
-            var bennes = _context.Bennes.ToList();
+            var bennes = await _context.Bennes
+                .Select(b => new BenneDto
+                {
+                    Id = b.Id,
+                    Nom = b.Nom,
+                    Localisation = b.Localisation,
+                    CapaciteMax = b.CapaciteMax
+                })
+                .ToListAsync();
+
             return Ok(bennes);
+        }
+
+
+        // GET: api/Bennes/overview
+
+        [HttpGet("overview")]
+        public async Task<IActionResult> GetOverview([FromServices] IBenneService benneService)
+        {
+            var overview = await benneService.GetOverviewAsync();
+            return Ok(overview);
+        }
+
+
+        // GET: api/Bennes/{id}
+
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<BenneDetailDto>> GetById(int id)
+        {
+             var benne = await _context.Bennes
+            .Where(b => b.Id == id)
+            .Select(b => new
+            {
+                b.Id,
+                b.Nom,
+                b.Localisation,
+                b.CapaciteMax,
+                DerniereMesure = b.Mesures
+                .OrderByDescending(m => m.Timestamp)
+                .Select(m => new MesureDto
+                {
+                    Timestamp = m.Timestamp,
+                    NiveauRemplissage = m.NiveauRemplissage,
+                    BatterieVolt = m.BatterieVolt
+                })
+                .FirstOrDefault()
+            })
+            .FirstOrDefaultAsync();
+
+            if (benne == null)
+                return NotFound();
+
+            var result = new BenneDetailDto
+            {
+                Id = benne.Id,
+                Nom = benne.Nom,
+                Localisation = benne.Localisation,
+                CapaciteMax = benne.CapaciteMax,
+                DerniereMesure = benne.DerniereMesure
+            };
+
+            return Ok(result);
+        }
+
+
+        // GET: api/Bennes/{id}/mesures
+
+        [HttpGet("{id}/mesures")]
+        public async Task<ActionResult<PagedResult<MesureDto>>> GetMesures(int id, int page = 1, int pageSize = 50)
+        {
+            var query = _context.Mesures
+                .Where(m => m.BenneId == id)
+                .OrderByDescending(m => m.Timestamp);
+
+            var total = await query.CountAsync();
+
+            var mesures = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(m => new MesureDto
+                {
+                    NiveauRemplissage = m.NiveauRemplissage,
+                    BatterieVolt = m.BatterieVolt,
+                    Timestamp = m.Timestamp
+                })
+                .ToListAsync();
+
+            return Ok(new PagedResult<MesureDto>
+            {
+                Total = total,
+                Page = page,
+                PageSize = pageSize,
+                Items = mesures
+            });
         }
 
 
@@ -57,52 +150,6 @@ namespace GestionBornesCollecte.Api.Controllers
             );
         }
 
-
-        // GET: api/Bennes/overview
-
-        [HttpGet("overview")]
-        public async Task<IActionResult> GetOverview([FromServices] IBenneService benneService)
-        {
-            var overview = await benneService.GetOverviewAsync();
-            return Ok(overview);
-        }
-
-
-        // GET: api/Bennes/{id}
-
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<BenneDetailDto>> GetById(int id)
-        {
-            var benne = await _context.Bennes
-                .Where(b => b.Id == id)
-                .Select(b => new BenneDetailDto
-                {
-                    Id = b.Id,
-                    Nom = b.Nom,
-                    Localisation = b.Localisation,
-                    CapaciteMax = b.CapaciteMax,
-                    DerniereMesure = b.Mesures
-                        .OrderByDescending(m => m.Timestamp)
-                        .Select(m => (DateTime?)m.Timestamp)
-                        .FirstOrDefault(),
-                    NiveauRemplissage = b.Mesures
-                        .OrderByDescending(m => m.Timestamp)
-                        .Select(m => (int?)m.NiveauRemplissage)
-                        .FirstOrDefault(),
-                    BatterieVolt = b.Mesures
-                        .OrderByDescending(m => m.Timestamp)
-                        .Select(m => (float?)m.BatterieVolt)
-                        .FirstOrDefault()
-                })
-                .FirstOrDefaultAsync();
-
-            if (benne == null)
-                return NotFound();
-
-            return Ok(benne);
-        }
-
-
         // PUT: api/Bennes/{id}
 
         [HttpPut("{id:int}")]
@@ -122,6 +169,22 @@ namespace GestionBornesCollecte.Api.Controllers
                 benne.CapaciteMax = dto.CapaciteMax.Value;
 
             await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+
+        // DELETE: api/Bennes/{id}
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var benne = await _context.Bennes.FindAsync(id);
+            if (benne == null)
+                return NotFound();
+
+            _context.Bennes.Remove(benne);
+            await _context.SaveChangesAsync();
+
             return NoContent();
         }
     }
