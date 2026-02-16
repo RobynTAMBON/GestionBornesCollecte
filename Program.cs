@@ -24,6 +24,9 @@ builder.Services.AddScoped<IBenneService, BenneService>();
 builder.Services.AddSingleton<MqttService>();
 builder.Services.AddHostedService<MqttHostedService>();
 
+// Ajout de SignalR (WebSocket)
+builder.Services.AddSignalR();
+
 
 var app = builder.Build();
 
