@@ -1,4 +1,5 @@
 using GestionBornesCollecte.Api.Data;
+using GestionBornesCollecte.Api.Hubs;
 using GestionBornesCollecte.Api.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,9 +27,23 @@ builder.Services.AddHostedService<MqttHostedService>();
 
 // Ajout de SignalR (WebSocket)
 builder.Services.AddSignalR();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("SignalRPolicy", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5500")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 
 
+
+// Build de l'application
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -37,10 +52,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+
 app.UseHttpsRedirection();
+app.UseCors("SignalRPolicy");
+app.MapHub<BennesHub>("/hubs/bennes");
+app.MapControllers();
 
 app.UseAuthorization();
 
-app.MapControllers();
 
 app.Run();
