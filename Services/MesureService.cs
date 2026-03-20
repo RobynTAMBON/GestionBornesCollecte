@@ -3,6 +3,7 @@ using GestionBornesCollecte.Api.Dtos;
 using GestionBornesCollecte.Api.Models;
 using Microsoft.AspNetCore.SignalR;
 using GestionBornesCollecte.Api.Hubs;
+using System.Text.Json;
 
 
 namespace GestionBornesCollecte.Api.Services
@@ -39,7 +40,8 @@ namespace GestionBornesCollecte.Api.Services
                 BatterieVolt = mesure.BatterieVolt,
                 Timestamp = mesure.Timestamp
             };
-            await _hub.Clients.All.SendAsync("MesureRecue", MRTdto);
+            Console.WriteLine("Envoi SignalR...");
+            await _hub.Clients.All.SendAsync("MesureRecue", JsonSerializer.Serialize(MRTdto));
             Console.WriteLine("SignalR - Mesure envoyée");
         }
     }

@@ -54,7 +54,7 @@ if (app.Environment.IsDevelopment())
 
 
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseCors("SignalRPolicy");
 app.MapHub<BennesHub>("/hubs/bennes");
 app.MapControllers();
