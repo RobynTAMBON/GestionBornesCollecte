@@ -23,7 +23,7 @@ namespace GestionBornesCollecte.Api.Controllers
 
         // GET: api/Bennes
 
-        [HttpGet("GetBennes")]
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<BenneDto>>> GetAll()
         {
             var bennes = await _context.Bennes

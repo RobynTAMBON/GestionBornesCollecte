@@ -11,6 +11,10 @@ using System.Windows.Shapes;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Text.Json;
 using GestionBornesCollecte.Wpf.DTO;
+using System.Collections.ObjectModel;
+using GestionBornesCollecte.Wpf.Models;
+using System.Net.Http;
+using System.Text.Json;
 
 namespace GestionBornesCollecte.Wpf
 {
@@ -20,14 +24,20 @@ namespace GestionBornesCollecte.Wpf
     public partial class MainWindow : Window
     {
         private HubConnection _connection;
+        public ObservableCollection<BenneViewModel> Bennes { get; set; } = new();
 
         public MainWindow()
         {
             InitializeComponent();
-            Loaded += MainWindow_Loaded;
+            DataContext = this;
+            Loaded += async (_, _) =>
+            {
+                await ChargerBennesAsync();
+                await InitialiserSignalR();
+            };
         }
 
-        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        private async Task InitialiserSignalR()
         {
             _connection = new HubConnectionBuilder()
                 .WithUrl("http://localhost:5211/hubs/bennes")   
@@ -40,11 +50,15 @@ namespace GestionBornesCollecte.Wpf
 
                 Dispatcher.Invoke(() =>
                 {
-                    MesuresList.Items.Add(
-                        $"Benne {data.BenneId} - {data.NiveauRemplissage}% - {data.BatterieVolt}V"
-                    );
+                    var benne = Bennes.FirstOrDefault(b => b.Id == data.BenneId);
+
+                    if (benne != null)
+                    {
+                        benne.Niveau = data.NiveauRemplissage;
+                        benne.Batterie = data.BatterieVolt;
+                    }
                 });
-            }); ;
+            });
 
             try
             {
@@ -54,6 +68,27 @@ namespace GestionBornesCollecte.Wpf
             catch (Exception ex)
             {
                 MesuresList.Items.Add("Erreur : " + ex.Message);
+            }
+        }
+
+        private async Task ChargerBennesAsync()
+        {
+            using var client = new HttpClient();
+
+            var response = await client.GetStringAsync("https://localhost:7134/api/Bennes/overview");
+
+            var bennes = JsonSerializer.Deserialize<List<BenneOverviewDto>>(response);
+
+            Bennes.Clear();
+
+            foreach (var b in bennes)
+            {
+                Bennes.Add(new BenneViewModel
+                {
+                    Id = b.Id,
+                    Niveau = b.NiveauRemplissage ?? 0,
+                    Batterie = b.BatterieVolt ?? 0
+                });
             }
         }
     }

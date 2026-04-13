@@ -8,5 +8,19 @@
         Title="Test SignalR" Height="450" Width="800">
     <Grid>
         <ListBox Name="MesuresList"/>
+        <ItemsControl ItemsSource="{Binding Bennes}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderBrush="Black" BorderThickness="1" Margin="5" Padding="10">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Id}" FontWeight="Bold" />
+                            <TextBlock Text="{Binding Niveau}" />
+                            <TextBlock Text="{Binding Batterie}" />
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
+    
 </Window>
