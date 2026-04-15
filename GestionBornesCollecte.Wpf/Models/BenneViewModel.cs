@@ -6,26 +6,31 @@ namespace GestionBornesCollecte.Wpf.Models
     {
         public int Id { get; set; }
 
-        private int _niveau;
-        public int Niveau
+        public string Nom { get; set; }
+        public string Etat { get; set; }
+
+        private int _niveauRemplissage;
+        public int NiveauRemplissage
         {
-            get => _niveau;
+            get => _niveauRemplissage;
             set
             {
-                _niveau = value;
-                OnPropertyChanged(nameof(Niveau));
+                _niveauRemplissage = value;
+                OnPropertyChanged(nameof(NiveauRemplissage));
             }
         }
-        private float _batterie;
-        public float Batterie
+
+        private float _batterieVolt;
+        public float BatterieVolt
         {
-            get => _batterie;
+            get => _batterieVolt;
             set
             {
-                _batterie = value;
-                OnPropertyChanged(nameof(Batterie));
+                _batterieVolt = value;
+                OnPropertyChanged(nameof(BatterieVolt));
             }
         }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged(string name)

@@ -54,8 +54,8 @@ namespace GestionBornesCollecte.Wpf
 
                     if (benne != null)
                     {
-                        benne.Niveau = data.NiveauRemplissage;
-                        benne.Batterie = data.BatterieVolt;
+                        benne.NiveauRemplissage = data.NiveauRemplissage;
+                        benne.BatterieVolt = data.BatterieVolt;
                     }
                 });
             });
@@ -86,8 +86,10 @@ namespace GestionBornesCollecte.Wpf
                 Bennes.Add(new BenneViewModel
                 {
                     Id = b.Id,
-                    Niveau = b.NiveauRemplissage ?? 0,
-                    Batterie = b.BatterieVolt ?? 0
+                    Nom = b.Nom,
+                    NiveauRemplissage = b.NiveauRemplissage ?? 0,
+                    BatterieVolt = b.BatterieVolt ?? 0,
+                    Etat = b.Etat
                 });
             }
         }
