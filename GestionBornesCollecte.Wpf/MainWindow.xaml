@@ -111,14 +111,6 @@
                                 </Grid>
                             </Border>
                         </Button>
-
-                        <!-- Hover effect -->
-                        <!--<DataTemplate.Triggers>
-                            <Trigger SourceName="" Property="IsMouseOver" Value="True">
-                                <Setter TargetName="" Property="Opacity" Value="0.95"/>
-                            </Trigger>
-                        </DataTemplate.Triggers>-->
-
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

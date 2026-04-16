@@ -7,7 +7,16 @@ namespace GestionBornesCollecte.Wpf.Models
         public int Id { get; set; }
 
         public string Nom { get; set; }
-        public string Etat { get; set; }
+        private string _etat;        
+        public string Etat
+        {
+            get => _etat;
+            set
+            {
+                _etat = value;
+                OnPropertyChanged(nameof(Etat));
+            }
+        }
 
         private int _niveauRemplissage;
         public int NiveauRemplissage
@@ -36,6 +45,15 @@ namespace GestionBornesCollecte.Wpf.Models
         protected void OnPropertyChanged(string name)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        public void MettreAJourEtat()
+        {
+            if (NiveauRemplissage >= 90)
+                Etat = "PLEINE";
+            else if (NiveauRemplissage >= 70)
+                Etat = "ALERTE";
+            else
+                Etat = "OK";
         }
     }
 }
