@@ -7,8 +7,7 @@
         mc:Ignorable="d"
         Title="Test SignalR" Height="450" Width="800">
     <Grid>
-        <ListBox Name="MesuresList"/>
-        <ScrollViewer>
+        <ScrollViewer Background="#F5F6FA">
             <ItemsControl ItemsSource="{Binding Bennes}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -18,16 +17,108 @@
 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button Margin="10" Padding="0" Command="{Binding DataContext.BenneClickCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}">
-                            <Border Padding="15" CornerRadius="10">
-                                <StackPanel>
-                                    <TextBlock Text="{Binding Nom}" FontSize="18" FontWeight="Bold"/>
-                                    <TextBlock Text="{Binding NiveauRemplissage, StringFormat=Niveau: {0}%}" />
-                                    <TextBlock Text="{Binding BatterieVolt, StringFormat=batterie: {0}V}" />
-                                    <TextBlock Text="{Binding Etat}" FontWeight="Bold"/>
-                                </StackPanel>
+                        <Button 
+                    Margin="12"
+                    Padding="0"
+                    BorderThickness="0"
+                    Background="Transparent"
+                    Command="{Binding DataContext.BenneClickCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                    CommandParameter="{Binding}">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="RenderTransform">
+                                        <Setter.Value>
+                                            <ScaleTransform ScaleX="1" ScaleY="1"/>
+                                        </Setter.Value>
+                                    </Setter>
+
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="RenderTransform">
+                                                <Setter.Value>
+                                                    <ScaleTransform ScaleX="1.03" ScaleY="1.03"/>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+
+                            <Border CornerRadius="12" Background="White" Padding="15">
+
+                                <!-- Ombre -->
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.2"/>
+                                </Border.Effect>
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="6"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Barre couleur état -->
+                                    <Border Grid.Column="0">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Gray"/>
+
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Etat}" Value="OK">
+                                                        <Setter Property="Background" Value="#4CAF50"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Etat}" Value="ALERTE">
+                                                        <Setter Property="Background" Value="#FF9800"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Etat}" Value="PLEINE">
+                                                        <Setter Property="Background" Value="#F44336"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                    </Border>
+
+                                    <!-- Contenu -->
+                                    <StackPanel Grid.Column="1" Margin="12,0,0,0">
+
+                                        <TextBlock 
+                                    Text="{Binding Nom}" 
+                                    FontSize="18"
+                                    FontWeight="SemiBold"
+                                    Foreground="#2C3E50"/>
+
+                                        <TextBlock 
+                                    Text="{Binding Etat}" 
+                                    FontSize="12"
+                                    Foreground="Gray"
+                                    Margin="0,0,0,8"/>
+
+                                        <!-- Niveau -->
+                                        <TextBlock Text="Niveau" FontSize="12" Foreground="Gray"/>
+                                        <ProgressBar 
+                                    Value="{Binding NiveauRemplissage}" 
+                                    Maximum="100"
+                                    Height="10"
+                                    Margin="0,2,0,8"/>
+
+                                        <!-- Batterie -->
+                                        <TextBlock 
+                                    Text="{Binding BatterieVolt, StringFormat=Batterie : {0} V}" 
+                                    FontSize="12"
+                                    Foreground="#555"/>
+
+                                    </StackPanel>
+                                </Grid>
                             </Border>
                         </Button>
+
+                        <!-- Hover effect -->
+                        <!--<DataTemplate.Triggers>
+                            <Trigger SourceName="" Property="IsMouseOver" Value="True">
+                                <Setter TargetName="" Property="Opacity" Value="0.95"/>
+                            </Trigger>
+                        </DataTemplate.Triggers>-->
+
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

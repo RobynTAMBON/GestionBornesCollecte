@@ -63,11 +63,10 @@ namespace GestionBornesCollecte.Wpf
             try
             {
                 await _connection.StartAsync();
-                MesuresList.Items.Add("Connecté à SignalR");
             }
             catch (Exception ex)
             {
-                MesuresList.Items.Add("Erreur : " + ex.Message);
+                Console.WriteLine($"Erreur de connexion SignalR : {ex.Message}");
             }
         }
 
