@@ -40,11 +40,7 @@ namespace GestionBornesCollecte.Api.Services
                     Etat = b.Mesures.Any()
                         ? b.Mesures
                             .OrderByDescending(m => m.Timestamp)
-                            .Select(m => m.NiveauRemplissage >= 90
-                                ? "PLEINE"
-                                : m.NiveauRemplissage >= 70
-                                    ? "ALERTE"
-                                    : "OK")
+                            .Select(m => BenneEtatHelper.CalculerEtat(m.NiveauRemplissage))
                             .First()
                         : "AUCUNE_MESURE"
                 })

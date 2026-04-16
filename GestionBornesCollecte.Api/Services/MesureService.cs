@@ -31,6 +31,7 @@ namespace GestionBornesCollecte.Api.Services
 
             _context.Mesures.Add(mesure);
             await _context.SaveChangesAsync();
+            var etat = BenneEtatHelper.CalculerEtat(mesure.NiveauRemplissage);
 
             // WebSocket
             var MRTdto = new MesureRealtimeDto
@@ -38,7 +39,8 @@ namespace GestionBornesCollecte.Api.Services
                 BenneId = mesure.BenneId,
                 NiveauRemplissage = mesure.NiveauRemplissage,
                 BatterieVolt = mesure.BatterieVolt,
-                Timestamp = mesure.Timestamp
+                Timestamp = mesure.Timestamp,
+                Etat = etat,
             };
             Console.WriteLine("Envoi SignalR...");
             await _hub.Clients.All.SendAsync("MesureRecue", JsonSerializer.Serialize(MRTdto));

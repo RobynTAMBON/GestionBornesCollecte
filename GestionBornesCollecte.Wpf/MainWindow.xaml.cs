@@ -56,7 +56,7 @@ namespace GestionBornesCollecte.Wpf
                     {
                         benne.NiveauRemplissage = data.NiveauRemplissage;
                         benne.BatterieVolt = data.BatterieVolt;
-                        benne.MettreAJourEtat();
+                        benne.Etat = data.Etat;
                     }
                 });
             });

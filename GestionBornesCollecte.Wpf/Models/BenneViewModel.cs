@@ -46,14 +46,5 @@ namespace GestionBornesCollecte.Wpf.Models
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
-        public void MettreAJourEtat()
-        {
-            if (NiveauRemplissage >= 90)
-                Etat = "PLEINE";
-            else if (NiveauRemplissage >= 70)
-                Etat = "ALERTE";
-            else
-                Etat = "OK";
-        }
     }
 }
