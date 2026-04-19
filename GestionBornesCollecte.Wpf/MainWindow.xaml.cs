@@ -15,16 +15,41 @@ using System.Collections.ObjectModel;
 using GestionBornesCollecte.Wpf.Models;
 using System.Net.Http;
 using System.Text.Json;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace GestionBornesCollecte.Wpf
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
         private HubConnection _connection;
         public ObservableCollection<BenneViewModel> Bennes { get; set; } = new();
+
+        private BenneViewModel _selectedBenne;
+        public BenneViewModel SelectedBenne
+        {
+            get => _selectedBenne;
+            set
+            {
+                if (_selectedBenne != value)
+                {
+                    _selectedBenne = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(HasSelectedBenne));
+                    updateLayoutColonnes();
+                }
+            }
+        }
+        public bool HasSelectedBenne => SelectedBenne != null;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
 
         public MainWindow()
         {
@@ -91,6 +116,30 @@ namespace GestionBornesCollecte.Wpf
                     BatterieVolt = b.BatterieVolt ?? 0,
                     Etat = b.Etat
                 });
+            }
+        }
+
+        private void Benne_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is BenneViewModel benne)
+            {
+                if (SelectedBenne == benne)
+                {
+                    SelectedBenne = null;
+                    return;
+                }
+                SelectedBenne = benne;
+            }
+        }
+
+        public void updateLayoutColonnes()
+        {
+            if (!HasSelectedBenne)
+            {
+                DetailColumn.Width = new GridLength(0);
+            }else
+            {
+                DetailColumn.Width = new GridLength(2, GridUnitType.Star);
             }
         }
     }

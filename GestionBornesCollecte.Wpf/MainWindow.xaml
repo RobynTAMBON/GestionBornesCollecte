@@ -6,8 +6,18 @@
         xmlns:local="clr-namespace:GestionBornesCollecte.Wpf"
         mc:Ignorable="d"
         Title="Test SignalR" Height="450" Width="800">
-    <Grid>
-        <ScrollViewer Background="#F5F6FA">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Window.Resources>
+    <Grid Background="Red">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition x:Name="DetailColumn" Width="0"/>
+        </Grid.ColumnDefinitions>
+
+
+        <!-- GAUCHE : Liste -->
+        <ScrollViewer Grid.Column="0" Background="#F5F6FA">
             <ItemsControl ItemsSource="{Binding Bennes}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -15,15 +25,15 @@
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
 
+
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Button 
-                    Margin="12"
-                    Padding="0"
-                    BorderThickness="0"
-                    Background="Transparent"
-                    Command="{Binding DataContext.BenneClickCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                    CommandParameter="{Binding}">
+                            Margin="12"
+                            Padding="0"
+                            BorderThickness="0"
+                            Background="Transparent"
+                            Click="Benne_Click">
                             <Button.Style>
                                 <Style TargetType="Button">
                                     <Setter Property="RenderTransform">
@@ -51,7 +61,7 @@
                                     <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.2"/>
                                 </Border.Effect>
 
-                                <Grid>
+                                <Grid Margin="15" MinHeight="200" MinWidth="400">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="6"/>
                                         <ColumnDefinition Width="*"/>
@@ -80,7 +90,6 @@
 
                                     <!-- Contenu -->
                                     <StackPanel Grid.Column="1" Margin="12,0,0,0">
-
                                         <TextBlock 
                                     Text="{Binding Nom}" 
                                     FontSize="18"
@@ -115,6 +124,26 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
+
+        <!-- Droite : Détails de la benne sélectionnée -->
+        <Border Grid.Column="1"
+        Background="White"
+        Padding="20">
+
+            <StackPanel DataContext="{Binding SelectedBenne}">
+                <TextBlock Text="{Binding Nom}" FontSize="24" FontWeight="Bold"/>
+                <TextBlock Text="{Binding Etat}" Margin="0,5,0,15"/>
+
+                <TextBlock Text="Niveau"/>
+                <ProgressBar Value="{Binding NiveauRemplissage}" Maximum="100"/>
+
+                <TextBlock Text="{Binding BatterieVolt, StringFormat=Batterie : {0} V}" Margin="0,10,0,0"/>
+            </StackPanel>
+
+        </Border>
+
+
     </Grid>
-    
+
+
 </Window>
